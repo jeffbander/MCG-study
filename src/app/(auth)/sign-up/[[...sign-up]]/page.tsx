@@ -80,6 +80,18 @@ export default function SignUpPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-6 mb-4">
+              <img
+                src="https://cdn.prod.website-files.com/622a3cfaa89636b753810f04/623947c1881c5c18445851c4_Sandbox-AQ.svg"
+                alt="Sandbox AQ"
+                className="h-12"
+              />
+              <img
+                src="https://55933-bcmed.s3.amazonaws.com/bcp/images/dmImage/SourceImage/ms_fuster_heart_vert_rgb-site11.jpg"
+                alt="Mount Sinai Fuster Heart"
+                className="h-12"
+              />
+            </div>
             <h1 className="text-2xl font-bold text-white">MCG Study App</h1>
             <p className="text-slate-400 mt-2">Verify your email</p>
           </div>
@@ -124,6 +136,18 @@ export default function SignUpPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-6 mb-4">
+            <img
+              src="https://cdn.prod.website-files.com/622a3cfaa89636b753810f04/623947c1881c5c18445851c4_Sandbox-AQ.svg"
+              alt="Sandbox AQ"
+              className="h-12"
+            />
+            <img
+              src="https://55933-bcmed.s3.amazonaws.com/bcp/images/dmImage/SourceImage/ms_fuster_heart_vert_rgb-site11.jpg"
+              alt="Mount Sinai Fuster Heart"
+              className="h-12"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-white">MCG Study App</h1>
           <p className="text-slate-400 mt-2">Create your account</p>
         </div>
