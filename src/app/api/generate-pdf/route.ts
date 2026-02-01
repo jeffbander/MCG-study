@@ -327,7 +327,7 @@ function generateMedicationsLog(doc: jsPDF, data: Record<string, unknown>, siteC
   doc.setFillColor(200, 200, 200);
   doc.rect(20, 45, 170, 8, 'F');
   doc.setFontSize(11);
-  doc.text('CONCOMITANT MEDICATIONS LOG', 105, 51, { align: 'center' });
+  doc.text('CARDIAC MEDICATIONS LOG', 105, 51, { align: 'center' });
 
   const medLog = data.medications_log as Record<string, unknown> || {};
   const medications = (medLog.medications as Array<Record<string, unknown>>) || [];
@@ -335,22 +335,22 @@ function generateMedicationsLog(doc: jsPDF, data: Record<string, unknown>, siteC
   if (medications.length > 0) {
     const tableData = medications.map((m) => [
       String(m.medication_name || ''),
-      `${m.dose || ''} ${m.unit || ''}`,
-      String(m.frequency || ''),
+      String(m.start_date || 'Unknown'),
+      String(m.end_date || 'Unknown'),
       String(m.route || ''),
-      String(m.indication || ''),
+      String(m.frequency || ''),
     ]);
 
     drawTable(
       doc,
       60,
-      ['Medication', 'Dose', 'Freq', 'Route', 'Indication'],
+      ['Medication', 'Start Date', 'End Date', 'Route', 'Frequency'],
       tableData,
-      [45, 30, 25, 25, 45]
+      [40, 30, 30, 35, 35]
     );
   } else {
     doc.setFontSize(10);
-    doc.text('No medications recorded.', 25, 70);
+    doc.text('No cardiac medications recorded.', 25, 70);
   }
 
   doc.setFontSize(8);

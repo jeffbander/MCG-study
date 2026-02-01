@@ -1127,7 +1127,7 @@ export default function MCGStudyApp() {
             </SectionCard>
 
             <SectionCard
-              title="Medications Log"
+              title="Cardiac Medications Log"
               icon={FileText}
               expanded={expandedSections.medications_log}
               onToggle={() => toggleSection('medications_log')}
@@ -1144,24 +1144,30 @@ export default function MCGStudyApp() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-sm text-slate-400">Dose:</span>
+                      <span className="text-sm text-slate-400">Start Date:</span>
                       <span className="ml-2 text-slate-100">
-                        {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                        {(med as Record<string, unknown>).start_date as string || 'Unknown'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-sm text-slate-400">Frequency:</span>
-                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                      <span className="text-sm text-slate-400">End Date:</span>
+                      <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                        {(med as Record<string, unknown>).end_date as string || 'Unknown'}
+                      </span>
                     </div>
                     <div>
                       <span className="text-sm text-slate-400">Route:</span>
                       <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
                     </div>
                   </div>
+                  <div className="mt-2">
+                    <span className="text-sm text-slate-400">Frequency:</span>
+                    <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                  </div>
                 </div>
               ))}
               {subject.medications_log.medications.length === 0 && (
-                <p className="text-slate-500 italic">No medications extracted</p>
+                <p className="text-slate-500 italic">No cardiac medications extracted</p>
               )}
             </SectionCard>
           </div>

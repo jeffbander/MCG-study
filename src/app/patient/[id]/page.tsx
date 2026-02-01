@@ -822,7 +822,7 @@ export default function PatientEditPage() {
             </SectionCard>
 
             <SectionCard
-              title="Medications Log"
+              title="Cardiac Medications Log"
               icon={FileText}
               expanded={expandedSections.medications_log}
               onToggle={() => toggleSection('medications_log')}
@@ -830,7 +830,7 @@ export default function PatientEditPage() {
               aiNotes={subject.medications_log.ai_notes}
             >
               <p className="text-sm text-slate-400 mb-4">
-                {subject.medications_log.medications.length} medication(s) recorded
+                {subject.medications_log.medications.length} cardiac medication(s) recorded
               </p>
               {subject.medications_log.medications.map((med, index) => (
                 <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2">
@@ -842,24 +842,30 @@ export default function PatientEditPage() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-sm text-slate-400">Dose:</span>
+                      <span className="text-sm text-slate-400">Start Date:</span>
                       <span className="ml-2 text-slate-100">
-                        {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                        {(med as Record<string, unknown>).start_date as string || 'Unknown'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-sm text-slate-400">Frequency:</span>
-                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                      <span className="text-sm text-slate-400">End Date:</span>
+                      <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                        {(med as Record<string, unknown>).end_date as string || 'Unknown'}
+                      </span>
                     </div>
                     <div>
                       <span className="text-sm text-slate-400">Route:</span>
                       <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
                     </div>
                   </div>
+                  <div className="mt-2">
+                    <span className="text-sm text-slate-400">Frequency:</span>
+                    <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                  </div>
                 </div>
               ))}
               {subject.medications_log.medications.length === 0 && (
-                <p className="text-slate-500 italic">No medications recorded</p>
+                <p className="text-slate-500 italic">No cardiac medications recorded</p>
               )}
             </SectionCard>
           </div>
