@@ -60,7 +60,7 @@ const createEmptySubject = (): SubjectData => ({
   inclusion_criteria: {
     age_18_or_older: null,
     scheduled_for_angiography: null,
-    able_to_comply: null,
+    able_to_comply: 'Yes',
     written_consent: null,
     female_negative_pregnancy: null,
     ai_notes: '',
@@ -537,7 +537,7 @@ export default function MCGStudyApp() {
                 <FileText className="w-5 h-5 text-slate-900" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-100">MCG Study Forms</h1>
+                <h1 className="text-xl font-bold text-slate-100">MCG Study Forms App</h1>
                 <p className="text-sm text-slate-400">Protocol SB-ACS-005</p>
               </div>
             </div>

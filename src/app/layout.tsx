@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MCG Study Forms - Protocol SB-ACS-005",
+  title: "MCG Study Forms App - Protocol SB-ACS-005",
   description: "Clinical research form generator for MCG Study Protocol SB-ACS-005",
 };
 
