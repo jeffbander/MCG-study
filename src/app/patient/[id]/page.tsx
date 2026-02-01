@@ -64,7 +64,7 @@ const createEmptySubject = (): SubjectData => ({
   inclusion_criteria: {
     age_18_or_older: null,
     scheduled_for_angiography: null,
-    able_to_comply: null,
+    able_to_comply: 'Yes',
     written_consent: null,
     female_negative_pregnancy: null,
     ai_notes: '',
