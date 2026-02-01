@@ -180,14 +180,24 @@ Analyze the clinical data and return a JSON object with the following structure.
         "medication_name": "Drug name",
         "dose": "amount",
         "unit": "mg/mcg/etc",
-        "frequency": "qd/bid/tid/qid/prn/other",
-        "route": "PO/IV/etc",
         "indication": "why prescribed",
-        "start_date": "DD-MMM-YY" or null
+        "start_date": "DD-MMM-YY" or null (earliest date found across all notes for when this medication was first prescribed),
+        "end_date": "DD-MMM-YY" or "Ongoing" (if the patient is still taking this medication, use "Ongoing"; otherwise use the date it was discontinued),
+        "route": "Oral/IV/Subcutaneous/Topical/etc" (use full word, e.g. "Oral" instead of "PO"),
+        "frequency": "Once daily/Twice daily/Three times daily/Four times daily/As needed/other" (use plain language instead of medical abbreviations like qd/bid/tid)
       }
     ],
-    "ai_notes": "Medication summary"
+    "ai_notes": "Cardiac medication summary"
   },
+
+  IMPORTANT MEDICATIONS INSTRUCTIONS:
+  - ONLY include medications related to heart disease or heart problems (cardiac medications)
+  - This includes but is not limited to: antiplatelets (aspirin, clopidogrel, ticagrelor, prasugrel), anticoagulants (warfarin, heparin, enoxaparin, apixaban, rivaroxaban), beta-blockers (metoprolol, atenolol, carvedilol), ACE inhibitors (lisinopril, enalapril, ramipril), ARBs (losartan, valsartan, irbesartan), statins (atorvastatin, rosuvastatin, simvastatin), nitrates (nitroglycerin, isosorbide), calcium channel blockers (amlodipine, diltiazem, verapamil), antiarrhythmics (amiodarone, flecainide, sotalol), diuretics for heart failure (furosemide, spironolactone, bumetanide), cardiac glycosides (digoxin), PCSK9 inhibitors, ezetimibe, ranolazine, hydralazine, sacubitril/valsartan (Entresto), ivabradine, dapagliflozin/empagliflozin (when used for heart failure)
+  - Do NOT include medications for non-cardiac conditions (e.g., metformin for diabetes alone, PPIs, antibiotics, pain medications, psychiatric medications, etc.) unless they have a clear cardiac indication
+  - For start_date: Look through ALL patient notes to find the earliest date this medication was prescribed or mentioned as being started
+  - For end_date: If the medication appears in the current/active medication list, use "Ongoing". If it was discontinued, use the discontinuation date. If unclear, use "Ongoing"
+  - For route: Use plain language (e.g., "Oral" not "PO", "Intravenous" not "IV")
+  - For frequency: Use plain language (e.g., "Twice daily" not "BID", "Once daily" not "QD")
 
   "catheterization": {
     "procedure_date": "DD-MMM-YY" or null,
