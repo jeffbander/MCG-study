@@ -832,50 +832,248 @@ export default function PatientEditPage() {
               <p className="text-sm text-slate-400 mb-4">
                 {subject.medications_log.medications.length} cardiac medication(s) recorded
               </p>
-              {subject.medications_log.medications.map((med, index) => (
-                <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <div>
-                      <span className="text-sm text-slate-400">Medication:</span>
-                      <span className="ml-2 text-slate-100 font-medium">
-                        {(med as Record<string, unknown>).medication_name as string}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-400">Dose:</span>
-                      <span className="ml-2 text-slate-100">
-                        {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-400">Indication:</span>
-                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).indication as string}</span>
-                    </div>
+
+              {/* Classification legend */}
+              {subject.medications_log.medications.length > 0 && (
+                <div className="flex flex-wrap gap-3 mb-4 p-3 bg-slate-800/30 rounded-lg">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                    <span className="text-xs text-slate-400">Home Med (Prior to Hospital)</span>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    <div>
-                      <span className="text-sm text-slate-400">Start Date:</span>
-                      <span className="ml-2 text-slate-100">
-                        {(med as Record<string, unknown>).start_date as string || 'Unknown'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-400">End Date:</span>
-                      <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
-                        {(med as Record<string, unknown>).end_date as string || 'Unknown'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-400">Route:</span>
-                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-400">Frequency:</span>
-                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
-                    </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
+                    <span className="text-xs text-slate-400">Hospital Only</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span className="text-xs text-slate-400">Hospital to Home</span>
                   </div>
                 </div>
-              ))}
+              )}
+
+              {/* Home Medications */}
+              {subject.medications_log.medications.filter(med => (med as Record<string, unknown>).classification === 'Home Med' || !(med as Record<string, unknown>).classification).length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-blue-400 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                    Home Medications (Prior to Hospitalization)
+                  </h4>
+                  {subject.medications_log.medications.map((med, index) => {
+                    const classification = (med as Record<string, unknown>).classification as string;
+                    if (classification && classification !== 'Home Med') return null;
+                    return (
+                      <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2 border-l-2 border-blue-400/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-100 font-medium">
+                              {(med as Record<string, unknown>).medication_name as string}
+                            </span>
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                              Home Med
+                            </span>
+                          </div>
+                          <select
+                            value={classification || 'Home Med'}
+                            onChange={(e) => {
+                              const updatedMeds = [...subject.medications_log.medications];
+                              updatedMeds[index] = { ...med, classification: e.target.value };
+                              updateSubjectField('medications_log', { ...subject.medications_log, medications: updatedMeds });
+                            }}
+                            className="px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded text-slate-200 focus:border-amber-500 outline-none"
+                          >
+                            <option value="Home Med">Home Med</option>
+                            <option value="Hospital Only">Hospital Only</option>
+                            <option value="Hospital to Home">Hospital to Home</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          <div>
+                            <span className="text-sm text-slate-400">Dose:</span>
+                            <span className="ml-2 text-slate-100">
+                              {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Indication:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).indication as string}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Started:</span>
+                            <span className={`ml-2 ${(med as Record<string, unknown>).start_date ? 'text-slate-100' : 'text-amber-400 italic'}`}>
+                              {(med as Record<string, unknown>).start_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                          <div>
+                            <span className="text-sm text-slate-400">End Date:</span>
+                            <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                              {(med as Record<string, unknown>).end_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Route:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Frequency:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Hospital Only Medications */}
+              {subject.medications_log.medications.filter(med => (med as Record<string, unknown>).classification === 'Hospital Only').length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+                    Hospital Only Medications
+                  </h4>
+                  {subject.medications_log.medications.map((med, index) => {
+                    if ((med as Record<string, unknown>).classification !== 'Hospital Only') return null;
+                    return (
+                      <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2 border-l-2 border-orange-400/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-100 font-medium">
+                              {(med as Record<string, unknown>).medication_name as string}
+                            </span>
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                              Hospital Only
+                            </span>
+                          </div>
+                          <select
+                            value={(med as Record<string, unknown>).classification as string}
+                            onChange={(e) => {
+                              const updatedMeds = [...subject.medications_log.medications];
+                              updatedMeds[index] = { ...med, classification: e.target.value };
+                              updateSubjectField('medications_log', { ...subject.medications_log, medications: updatedMeds });
+                            }}
+                            className="px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded text-slate-200 focus:border-amber-500 outline-none"
+                          >
+                            <option value="Home Med">Home Med</option>
+                            <option value="Hospital Only">Hospital Only</option>
+                            <option value="Hospital to Home">Hospital to Home</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          <div>
+                            <span className="text-sm text-slate-400">Dose:</span>
+                            <span className="ml-2 text-slate-100">
+                              {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Indication:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).indication as string}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Route:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                          <div>
+                            <span className="text-sm text-slate-400">Start Date:</span>
+                            <span className="ml-2 text-slate-100">
+                              {(med as Record<string, unknown>).start_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">End Date:</span>
+                            <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                              {(med as Record<string, unknown>).end_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Frequency:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Hospital to Home Medications */}
+              {subject.medications_log.medications.filter(med => (med as Record<string, unknown>).classification === 'Hospital to Home').length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-emerald-400 mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    Started in Hospital, Continued at Home
+                  </h4>
+                  {subject.medications_log.medications.map((med, index) => {
+                    if ((med as Record<string, unknown>).classification !== 'Hospital to Home') return null;
+                    return (
+                      <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2 border-l-2 border-emerald-400/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-100 font-medium">
+                              {(med as Record<string, unknown>).medication_name as string}
+                            </span>
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              Hospital to Home
+                            </span>
+                          </div>
+                          <select
+                            value={(med as Record<string, unknown>).classification as string}
+                            onChange={(e) => {
+                              const updatedMeds = [...subject.medications_log.medications];
+                              updatedMeds[index] = { ...med, classification: e.target.value };
+                              updateSubjectField('medications_log', { ...subject.medications_log, medications: updatedMeds });
+                            }}
+                            className="px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded text-slate-200 focus:border-amber-500 outline-none"
+                          >
+                            <option value="Home Med">Home Med</option>
+                            <option value="Hospital Only">Hospital Only</option>
+                            <option value="Hospital to Home">Hospital to Home</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          <div>
+                            <span className="text-sm text-slate-400">Dose:</span>
+                            <span className="ml-2 text-slate-100">
+                              {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Indication:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).indication as string}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Route:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                          <div>
+                            <span className="text-sm text-slate-400">Start Date:</span>
+                            <span className="ml-2 text-slate-100">
+                              {(med as Record<string, unknown>).start_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">End Date:</span>
+                            <span className={`ml-2 ${(med as Record<string, unknown>).end_date === 'Ongoing' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                              {(med as Record<string, unknown>).end_date as string || 'Unknown'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-slate-400">Frequency:</span>
+                            <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               {subject.medications_log.medications.length === 0 && (
                 <p className="text-slate-500 italic">No cardiac medications recorded</p>
               )}

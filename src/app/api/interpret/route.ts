@@ -181,6 +181,7 @@ Analyze the clinical data and return a JSON object with the following structure.
         "dose": "amount",
         "unit": "mg/mcg/etc",
         "indication": "why prescribed",
+        "classification": "Home Med" or "Hospital Only" or "Hospital to Home",
         "start_date": "DD-MMM-YY" or null (earliest date found across all notes for when this medication was first prescribed),
         "end_date": "DD-MMM-YY" or "Ongoing" (if the patient is still taking this medication, use "Ongoing"; otherwise use the date it was discontinued),
         "route": "Oral/IV/Subcutaneous/Topical/etc" (use full word, e.g. "Oral" instead of "PO"),
@@ -194,6 +195,19 @@ Analyze the clinical data and return a JSON object with the following structure.
   - ONLY include medications related to heart disease or heart problems (cardiac medications)
   - This includes but is not limited to: antiplatelets (aspirin, clopidogrel, ticagrelor, prasugrel), anticoagulants (warfarin, heparin, enoxaparin, apixaban, rivaroxaban), beta-blockers (metoprolol, atenolol, carvedilol), ACE inhibitors (lisinopril, enalapril, ramipril), ARBs (losartan, valsartan, irbesartan), statins (atorvastatin, rosuvastatin, simvastatin), nitrates (nitroglycerin, isosorbide), calcium channel blockers (amlodipine, diltiazem, verapamil), antiarrhythmics (amiodarone, flecainide, sotalol), diuretics for heart failure (furosemide, spironolactone, bumetanide), cardiac glycosides (digoxin), PCSK9 inhibitors, ezetimibe, ranolazine, hydralazine, sacubitril/valsartan (Entresto), ivabradine, dapagliflozin/empagliflozin (when used for heart failure)
   - Do NOT include medications for non-cardiac conditions (e.g., metformin for diabetes alone, PPIs, antibiotics, pain medications, psychiatric medications, etc.) unless they have a clear cardiac indication
+
+  MEDICATION CLASSIFICATION INSTRUCTIONS:
+  - Each medication MUST have a "classification" field with one of three values:
+    1. "Home Med" - Medication the patient was already taking at home PRIOR to this hospitalization. These are medications on the patient's home medication list or medications documented as being taken before admission. For these medications, the start_date should reflect when the patient originally started the medication; if no start date is available, use null (it will display as "Unknown").
+    2. "Hospital Only" - Medication that was ONLY given during the hospital stay and will NOT be continued at discharge. Examples: IV heparin drip, IV nitroglycerin, IV vasopressors, loading doses given only in hospital, medications discontinued before discharge.
+    3. "Hospital to Home" - Medication that was newly started during this hospitalization and the patient will CONTINUE taking at home after discharge. These are new prescriptions initiated during the admission that appear on the discharge medication list.
+  - Use clinical context clues to determine classification:
+    - Home medication lists, "prior to admission" notes, and preadmission medication reconciliation indicate "Home Med"
+    - IV medications, one-time doses, and medications not on discharge list indicate "Hospital Only"
+    - New prescriptions during admission that appear on discharge medication list indicate "Hospital to Home"
+    - If a medication was a home med AND continued through hospitalization, classify as "Home Med"
+    - If classification is truly unclear, default to "Home Med" for oral medications and "Hospital Only" for IV medications
+
   - For start_date: Look through ALL patient notes to find the earliest date this medication was prescribed or mentioned as being started
   - For end_date: If the medication appears in the current/active medication list, use "Ongoing". If it was discontinued, use the discontinuation date. If unclear, use "Ongoing"
   - For route: Use plain language (e.g., "Oral" not "PO", "Intravenous" not "IV")
