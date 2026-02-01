@@ -178,6 +178,9 @@ Analyze the clinical data and return a JSON object with the following structure.
     "medications": [
       {
         "medication_name": "Drug name",
+        "dose": "amount",
+        "unit": "mg/mcg/etc",
+        "indication": "why prescribed",
         "start_date": "DD-MMM-YY" or null (earliest date found across all notes for when this medication was first prescribed),
         "end_date": "DD-MMM-YY" or "Ongoing" (if the patient is still taking this medication, use "Ongoing"; otherwise use the date it was discontinued),
         "route": "Oral/IV/Subcutaneous/Topical/etc" (use full word, e.g. "Oral" instead of "PO"),

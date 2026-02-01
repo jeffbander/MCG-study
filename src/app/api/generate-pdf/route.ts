@@ -335,6 +335,7 @@ function generateMedicationsLog(doc: jsPDF, data: Record<string, unknown>, siteC
   if (medications.length > 0) {
     const tableData = medications.map((m) => [
       String(m.medication_name || ''),
+      `${m.dose || ''} ${m.unit || ''}`.trim(),
       String(m.start_date || 'Unknown'),
       String(m.end_date || 'Unknown'),
       String(m.route || ''),
@@ -344,9 +345,9 @@ function generateMedicationsLog(doc: jsPDF, data: Record<string, unknown>, siteC
     drawTable(
       doc,
       60,
-      ['Medication', 'Start Date', 'End Date', 'Route', 'Frequency'],
+      ['Medication', 'Dose', 'Start', 'End', 'Route', 'Freq'],
       tableData,
-      [40, 30, 30, 35, 35]
+      [30, 25, 25, 25, 30, 35]
     );
   } else {
     doc.setFontSize(10);

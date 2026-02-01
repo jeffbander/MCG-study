@@ -1136,13 +1136,25 @@ export default function MCGStudyApp() {
             >
               {subject.medications_log.medications.map((med, index) => (
                 <div key={index} className="p-3 bg-slate-800/50 rounded-lg mb-2">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <div>
                       <span className="text-sm text-slate-400">Medication:</span>
                       <span className="ml-2 text-slate-100 font-medium">
                         {(med as Record<string, unknown>).medication_name as string}
                       </span>
                     </div>
+                    <div>
+                      <span className="text-sm text-slate-400">Dose:</span>
+                      <span className="ml-2 text-slate-100">
+                        {(med as Record<string, unknown>).dose as string} {(med as Record<string, unknown>).unit as string}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-slate-400">Indication:</span>
+                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).indication as string}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
                     <div>
                       <span className="text-sm text-slate-400">Start Date:</span>
                       <span className="ml-2 text-slate-100">
@@ -1159,10 +1171,10 @@ export default function MCGStudyApp() {
                       <span className="text-sm text-slate-400">Route:</span>
                       <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).route as string}</span>
                     </div>
-                  </div>
-                  <div className="mt-2">
-                    <span className="text-sm text-slate-400">Frequency:</span>
-                    <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                    <div>
+                      <span className="text-sm text-slate-400">Frequency:</span>
+                      <span className="ml-2 text-slate-100">{(med as Record<string, unknown>).frequency as string}</span>
+                    </div>
                   </div>
                 </div>
               ))}
