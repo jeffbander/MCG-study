@@ -103,20 +103,52 @@ Analyze the clinical data and return a JSON object with the following structure.
   },
 
   "medical_conditions": {
-    "mi_history": {"present": "Yes" or "No", "diagnosis_date": "DD-MMM-YY or null", "notes": ""},
-    "lvh": {"present": "Yes" or "No", "diagnosis_date": null, "notes": ""},
-    "valvular_disease": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "specify valve and severity"},
-    "chf": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "include EF if available"},
-    "pulmonary_hypertension": {"present": "Yes" or "No", "diagnosis_date": null, "notes": ""},
-    "angina": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "stable/unstable"},
-    "cardiomyopathy": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "type"},
-    "diabetes": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "Type 1/2, A1c if available"},
-    "ckd": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "stage, GFR if available"},
-    "cad": {"present": "Yes" or "No", "diagnosis_date": null, "notes": "vessels involved"},
-    "hypertension": {"present": "Yes" or "No", "diagnosis_date": null, "notes": ""},
-    "hyperlipidemia": {"present": "Yes" or "No", "diagnosis_date": null, "notes": ""},
+    "acs": {"present": "Yes" or "No", "type_details": "STEMI" or "NSTEMI Type I" or "NSTEMI Type II" or "Unstable Angina" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "DD-MMM-YY" or "Ongoing" or null, "notes": ""},
+    "mi": {"present": "Yes" or "No", "type_details": "STEMI" or "NSTEMI Type I" or "NSTEMI Type II" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "DD-MMM-YY" or null, "notes": ""},
+    "angina": {"present": "Yes" or "No", "type_details": "Stable" or "Unstable" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "DD-MMM-YY" or null, "notes": ""},
+    "lvh": {"present": "Yes" or "No", "type_details": null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "valvular_disease": {"present": "Yes" or "No", "type_details": "specify valve and severity", "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "chf": {"present": "Yes" or "No", "type_details": "HFrEF" or "HFpEF" or "HFmrEF" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": "include EF if available"},
+    "pulmonary_hypertension": {"present": "Yes" or "No", "type_details": null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "cardiomyopathy": {"present": "Yes" or "No", "type_details": "Dilated" or "Hypertrophic" or "Restrictive" or "Ischemic" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "diabetes": {"present": "Yes" or "No", "type_details": "Type 1" or "Type 2" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": "A1c if available"},
+    "ckd": {"present": "Yes" or "No", "type_details": "Stage 1" or "Stage 2" or "Stage 3a" or "Stage 3b" or "Stage 4" or "Stage 5" or null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": "GFR if available"},
+    "cad": {"present": "Yes" or "No", "type_details": "vessels involved", "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "hypertension": {"present": "Yes" or "No", "type_details": null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
+    "hyperlipidemia": {"present": "Yes" or "No", "type_details": null, "onset_date": "DD-MMM-YY" or null, "end_date": "Ongoing", "notes": ""},
     "ai_notes": "Any additional conditions or notes"
   },
+
+  IMPORTANT MEDICAL CONDITIONS INSTRUCTIONS - ACS/MI/ANGINA CASCADING LOGIC:
+  ACS (Acute Coronary Syndrome), MI (Myocardial Infarction), and Angina are THREE SEPARATE conditions that must be filled out according to these rules:
+
+  1. If patient has NSTEMI (Type I or Type II):
+     - MI: present = "Yes", type_details = "NSTEMI Type I" or "NSTEMI Type II"
+     - Angina: present = "Yes", type_details = "Unstable"
+     - ACS: present = "Yes", type_details = same as MI type
+
+  2. If patient has STEMI:
+     - MI: present = "Yes", type_details = "STEMI"
+     - ACS: present = "Yes", type_details = "STEMI"
+     - Angina: may or may not be present (assess independently)
+
+  3. If patient has Unstable Angina (without MI):
+     - Angina: present = "Yes", type_details = "Unstable"
+     - ACS: present = "Yes", type_details = "Unstable Angina"
+     - MI: present = "No"
+
+  4. If patient has Stable Angina:
+     - Angina: present = "Yes", type_details = "Stable"
+     - ACS: present = "No" (stable angina is NOT ACS)
+     - MI: present = "No" (unless separate MI event)
+
+  5. ACS ONLY includes: STEMI, NSTEMI Type I, NSTEMI Type II, and Unstable Angina. Stable angina is NOT ACS.
+
+  IMPORTANT END DATE RULES:
+  - Chronic conditions (hypertension, hyperlipidemia, diabetes, CKD, LVH, valvular disease, CHF, pulmonary hypertension, cardiomyopathy, CAD): end_date = "Ongoing" (always)
+  - For MI, Angina, and ACS: end_date = the date of cardiac catheterization (cath date) from the catheterization procedure. If no cath date available, use "Ongoing"
+  - NSTEMI Type I = atherothrombotic event (plaque rupture/erosion)
+  - NSTEMI Type II = supply-demand mismatch (secondary to another condition)
 
   "arrhythmia_history": {
     "afib_aflutter": "Yes" or "No",

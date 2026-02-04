@@ -237,23 +237,85 @@ function generateMedicalHistory(doc: jsPDF, data: Record<string, unknown>, siteC
 
   doc.setFont('helvetica', 'normal');
   const conditions = data.medical_conditions as Record<string, unknown> || {};
-  const conditionList = [
-    { key: 'mi_history', label: 'MI History' },
-    { key: 'hypertension', label: 'Hypertension' },
-    { key: 'diabetes', label: 'Diabetes' },
-    { key: 'cad', label: 'CAD' },
-    { key: 'chf', label: 'CHF' },
-    { key: 'hyperlipidemia', label: 'Hyperlipidemia' },
+
+  // ACS/MI/Angina Section
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Acute Coronary Events:', 25, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+
+  const acuteConditions = [
+    { key: 'acs', label: 'ACS' },
+    { key: 'mi', label: 'MI' },
+    { key: 'angina', label: 'Angina' },
   ];
 
-  for (const cond of conditionList) {
+  for (const cond of acuteConditions) {
     const condData = conditions[cond.key] as Record<string, unknown> || {};
-    doc.text(`${cond.label}: ${formatYesNo(condData.present as string | null)}`, 25, y);
-    if (condData.notes) {
-      doc.text(`(${condData.notes})`, 100, y);
+    let line = `${cond.label}: ${formatYesNo(condData.present as string | null)}`;
+    if (condData.type_details) line += ` (${condData.type_details})`;
+    doc.text(line, 30, y);
+    if (condData.onset_date || condData.end_date) {
+      doc.text(`Onset: ${condData.onset_date || '___'} | End: ${condData.end_date || '___'}`, 110, y);
     }
-    y += 7;
+    y += 5;
   }
+
+  y += 3;
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Cardiac Conditions (Chronic):', 25, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+
+  const cardiacConditions = [
+    { key: 'cad', label: 'CAD' },
+    { key: 'chf', label: 'CHF' },
+    { key: 'lvh', label: 'LVH' },
+    { key: 'valvular_disease', label: 'Valvular Disease' },
+    { key: 'pulmonary_hypertension', label: 'Pulmonary HTN' },
+    { key: 'cardiomyopathy', label: 'Cardiomyopathy' },
+  ];
+
+  for (const cond of cardiacConditions) {
+    const condData = conditions[cond.key] as Record<string, unknown> || {};
+    let line = `${cond.label}: ${formatYesNo(condData.present as string | null)}`;
+    if (condData.type_details) line += ` (${condData.type_details})`;
+    doc.text(line, 30, y);
+    if (condData.onset_date) {
+      doc.text(`Onset: ${condData.onset_date}`, 130, y);
+    }
+    y += 5;
+  }
+
+  y += 3;
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Systemic Conditions (Chronic):', 25, y);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+
+  const systemicConditions = [
+    { key: 'hypertension', label: 'Hypertension' },
+    { key: 'hyperlipidemia', label: 'Hyperlipidemia' },
+    { key: 'diabetes', label: 'Diabetes' },
+    { key: 'ckd', label: 'CKD' },
+  ];
+
+  for (const cond of systemicConditions) {
+    const condData = conditions[cond.key] as Record<string, unknown> || {};
+    let line = `${cond.label}: ${formatYesNo(condData.present as string | null)}`;
+    if (condData.type_details) line += ` (${condData.type_details})`;
+    if (condData.notes) line += ` - ${condData.notes}`;
+    doc.text(line, 30, y);
+    y += 5;
+  }
+
+  doc.setFontSize(10);
 
   // ACS Risk
   y += 5;
