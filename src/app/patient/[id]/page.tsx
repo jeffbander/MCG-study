@@ -99,18 +99,19 @@ const createEmptySubject = (): SubjectData => ({
     ai_notes: '',
   },
   medical_conditions: {
-    mi_history: { present: null, diagnosis_date: '', notes: '' },
-    lvh: { present: null, diagnosis_date: '', notes: '' },
-    valvular_disease: { present: null, diagnosis_date: '', notes: '' },
-    chf: { present: null, diagnosis_date: '', notes: '' },
-    pulmonary_hypertension: { present: null, diagnosis_date: '', notes: '' },
-    angina: { present: null, diagnosis_date: '', notes: '' },
-    cardiomyopathy: { present: null, diagnosis_date: '', notes: '' },
-    diabetes: { present: null, diagnosis_date: '', notes: '' },
-    ckd: { present: null, diagnosis_date: '', notes: '' },
-    cad: { present: null, diagnosis_date: '', notes: '' },
-    hypertension: { present: null, diagnosis_date: '', notes: '' },
-    hyperlipidemia: { present: null, diagnosis_date: '', notes: '' },
+    acs: { present: null, type_details: null, onset_date: '', end_date: '', notes: '' },
+    mi: { present: null, type_details: null, onset_date: '', end_date: '', notes: '' },
+    angina: { present: null, type_details: null, onset_date: '', end_date: '', notes: '' },
+    lvh: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    valvular_disease: { present: null, type_details: '', onset_date: '', end_date: 'Ongoing', notes: '' },
+    chf: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    pulmonary_hypertension: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    cardiomyopathy: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    diabetes: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    ckd: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    cad: { present: null, type_details: '', onset_date: '', end_date: 'Ongoing', notes: '' },
+    hypertension: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
+    hyperlipidemia: { present: null, type_details: null, onset_date: '', end_date: 'Ongoing', notes: '' },
     ai_notes: '',
   },
   arrhythmia_history: {
@@ -255,6 +256,129 @@ const FormField = ({
     </label>
     {children}
     {hint && <span className="text-xs text-slate-500">{hint}</span>}
+  </div>
+);
+
+// Medical Condition Row Component
+interface MedicalConditionData {
+  present: string | null;
+  type_details: string | null;
+  onset_date: string;
+  end_date: string;
+  notes: string;
+}
+
+const MedicalConditionRow = ({
+  label,
+  conditionKey,
+  condition,
+  onChange,
+  typeOptions,
+  isChronicCondition = false,
+  hint = '',
+}: {
+  label: string;
+  conditionKey: string;
+  condition: MedicalConditionData;
+  onChange: (field: string, value: string | null) => void;
+  typeOptions?: { value: string; label: string }[];
+  isChronicCondition?: boolean;
+  hint?: string;
+}) => (
+  <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <span className="font-medium text-slate-200">{label}</span>
+        {hint && <span className="text-xs text-slate-500">{hint}</span>}
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {/* Present */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-400">Present</label>
+          <select
+            value={condition.present || ''}
+            onChange={(e) => onChange('present', e.target.value || null)}
+            className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 focus:border-amber-500 outline-none"
+          >
+            <option value="">-- Select --</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        {/* Type/Details */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-400">Type/Details</label>
+          {typeOptions ? (
+            <select
+              value={condition.type_details || ''}
+              onChange={(e) => onChange('type_details', e.target.value || null)}
+              className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 focus:border-amber-500 outline-none"
+              disabled={condition.present !== 'Yes'}
+            >
+              <option value="">-- Select --</option>
+              {typeOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={condition.type_details || ''}
+              onChange={(e) => onChange('type_details', e.target.value || null)}
+              placeholder="Details..."
+              className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none"
+              disabled={condition.present !== 'Yes'}
+            />
+          )}
+        </div>
+
+        {/* Onset Date */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-400">Onset Date</label>
+          <input
+            type="text"
+            value={condition.onset_date || ''}
+            onChange={(e) => onChange('onset_date', e.target.value)}
+            placeholder="DD-MMM-YY"
+            className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none"
+            disabled={condition.present !== 'Yes'}
+          />
+        </div>
+
+        {/* End Date */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-400">End Date</label>
+          {isChronicCondition ? (
+            <div className="px-2 py-1.5 bg-slate-900 border border-slate-700 rounded text-sm text-emerald-400">
+              Ongoing
+            </div>
+          ) : (
+            <input
+              type="text"
+              value={condition.end_date || ''}
+              onChange={(e) => onChange('end_date', e.target.value)}
+              placeholder="DD-MMM-YY or Ongoing"
+              className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none"
+              disabled={condition.present !== 'Yes'}
+            />
+          )}
+        </div>
+
+        {/* Notes */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-400">Notes</label>
+          <input
+            type="text"
+            value={condition.notes || ''}
+            onChange={(e) => onChange('notes', e.target.value)}
+            placeholder="Additional notes..."
+            className="px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-sm text-slate-100 placeholder-slate-500 focus:border-amber-500 outline-none"
+            disabled={condition.present !== 'Yes'}
+          />
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -470,6 +594,114 @@ export default function PatientEditPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Handler for medical condition changes with cascading logic for ACS/MI/Angina
+  const updateMedicalCondition = (conditionKey: string, field: string, value: string | null) => {
+    const conditions = subject.medical_conditions as Record<string, MedicalConditionData>;
+    const updatedConditions = { ...conditions };
+
+    // Update the specific field
+    updatedConditions[conditionKey] = {
+      ...updatedConditions[conditionKey],
+      [field]: value,
+    };
+
+    // Cascading logic for ACS/MI/Angina
+    if (conditionKey === 'mi' && field === 'type_details' && value) {
+      // If MI type is set, apply cascading logic
+      if (value === 'NSTEMI Type I' || value === 'NSTEMI Type II') {
+        // NSTEMI -> MI = Yes, Angina = Yes (Unstable), ACS = Yes
+        updatedConditions.mi.present = 'Yes';
+        updatedConditions.angina = {
+          ...updatedConditions.angina,
+          present: 'Yes',
+          type_details: 'Unstable',
+        };
+        updatedConditions.acs = {
+          ...updatedConditions.acs,
+          present: 'Yes',
+          type_details: value,
+        };
+      } else if (value === 'STEMI') {
+        // STEMI -> MI = Yes, ACS = Yes
+        updatedConditions.mi.present = 'Yes';
+        updatedConditions.acs = {
+          ...updatedConditions.acs,
+          present: 'Yes',
+          type_details: 'STEMI',
+        };
+      }
+    }
+
+    if (conditionKey === 'angina' && field === 'type_details' && value) {
+      if (value === 'Unstable') {
+        // Unstable Angina -> Angina = Yes, ACS = Yes
+        updatedConditions.angina.present = 'Yes';
+        // Only set ACS to Unstable Angina if MI is not present
+        if (updatedConditions.mi.present !== 'Yes') {
+          updatedConditions.acs = {
+            ...updatedConditions.acs,
+            present: 'Yes',
+            type_details: 'Unstable Angina',
+          };
+        }
+      } else if (value === 'Stable') {
+        // Stable Angina -> Angina = Yes, ACS = No (stable angina is NOT ACS)
+        updatedConditions.angina.present = 'Yes';
+        // Only set ACS to No if there's no MI
+        if (updatedConditions.mi.present !== 'Yes') {
+          updatedConditions.acs = {
+            ...updatedConditions.acs,
+            present: 'No',
+            type_details: null,
+          };
+        }
+      }
+    }
+
+    // If MI is set to No, clear MI type and potentially update ACS
+    if (conditionKey === 'mi' && field === 'present' && value === 'No') {
+      updatedConditions.mi.type_details = null;
+      // If angina is also not present or stable, set ACS to No
+      if (updatedConditions.angina.present !== 'Yes' || updatedConditions.angina.type_details === 'Stable') {
+        updatedConditions.acs = {
+          ...updatedConditions.acs,
+          present: 'No',
+          type_details: null,
+        };
+      } else if (updatedConditions.angina.type_details === 'Unstable') {
+        // If unstable angina exists without MI, ACS is Unstable Angina
+        updatedConditions.acs = {
+          ...updatedConditions.acs,
+          present: 'Yes',
+          type_details: 'Unstable Angina',
+        };
+      }
+    }
+
+    // If Angina is set to No, clear angina type and potentially update ACS
+    if (conditionKey === 'angina' && field === 'present' && value === 'No') {
+      updatedConditions.angina.type_details = null;
+      // If MI is also not present, set ACS to No
+      if (updatedConditions.mi.present !== 'Yes') {
+        updatedConditions.acs = {
+          ...updatedConditions.acs,
+          present: 'No',
+          type_details: null,
+        };
+      }
+    }
+
+    // Use cath date for end_date of MI, Angina, ACS if available
+    const cathDate = (subject.catheterization as Record<string, unknown>)?.procedure_date as string | null;
+    if (cathDate && (conditionKey === 'mi' || conditionKey === 'angina' || conditionKey === 'acs')) {
+      if (field === 'present' && value === 'Yes') {
+        updatedConditions[conditionKey].end_date = cathDate;
+      }
+    }
+
+    updateSubjectField('medical_conditions', updatedConditions);
   };
 
   const getSectionStatus = (section: keyof SubjectData): 'complete' | 'incomplete' | 'ai_filled' | 'error' => {
@@ -777,6 +1009,193 @@ export default function PatientEditPage() {
                   <option value="High">High (NSTEMI with high-risk features)</option>
                 </select>
               </FormField>
+            </SectionCard>
+
+            <SectionCard
+              title="Medical Conditions"
+              icon={FileText}
+              expanded={expandedSections.medical_conditions}
+              onToggle={() => toggleSection('medical_conditions')}
+              status={getSectionStatus('medical_conditions')}
+              aiNotes={(subject.medical_conditions as Record<string, unknown>).ai_notes as string}
+            >
+              {/* Clinical Logic Rules Info Box */}
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg mb-4">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-slate-300">
+                    <p className="font-medium text-amber-400 mb-2">ACS/MI/Angina Cascading Logic:</p>
+                    <ul className="list-disc list-inside space-y-1 text-xs text-slate-400">
+                      <li><strong>NSTEMI (Type I or II)</strong>: Auto-sets MI = Yes, Angina = Yes (Unstable), ACS = Yes</li>
+                      <li><strong>STEMI</strong>: Auto-sets MI = Yes, ACS = Yes</li>
+                      <li><strong>Unstable Angina</strong>: Auto-sets Angina = Yes, ACS = Yes</li>
+                      <li><strong>Stable Angina</strong>: Sets Angina = Yes, but ACS = No (stable angina is NOT ACS)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* ACS/MI/Angina Section */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                  Acute Coronary Events
+                </h4>
+                <div className="space-y-3">
+                  <MedicalConditionRow
+                    label="ACS (Acute Coronary Syndrome)"
+                    conditionKey="acs"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).acs}
+                    onChange={(field, value) => updateMedicalCondition('acs', field, value)}
+                    typeOptions={[
+                      { value: 'STEMI', label: 'STEMI' },
+                      { value: 'NSTEMI Type I', label: 'NSTEMI Type I (Atherothrombotic)' },
+                      { value: 'NSTEMI Type II', label: 'NSTEMI Type II (Supply-Demand Mismatch)' },
+                      { value: 'Unstable Angina', label: 'Unstable Angina' },
+                    ]}
+                    hint="End date = Cath date"
+                  />
+                  <MedicalConditionRow
+                    label="MI (Myocardial Infarction)"
+                    conditionKey="mi"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).mi}
+                    onChange={(field, value) => updateMedicalCondition('mi', field, value)}
+                    typeOptions={[
+                      { value: 'STEMI', label: 'STEMI' },
+                      { value: 'NSTEMI Type I', label: 'NSTEMI Type I (Atherothrombotic)' },
+                      { value: 'NSTEMI Type II', label: 'NSTEMI Type II (Supply-Demand Mismatch)' },
+                    ]}
+                    hint="End date = Cath date"
+                  />
+                  <MedicalConditionRow
+                    label="Angina"
+                    conditionKey="angina"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).angina}
+                    onChange={(field, value) => updateMedicalCondition('angina', field, value)}
+                    typeOptions={[
+                      { value: 'Stable', label: 'Stable' },
+                      { value: 'Unstable', label: 'Unstable' },
+                    ]}
+                    hint="End date = Cath date"
+                  />
+                </div>
+              </div>
+
+              {/* Cardiac Conditions */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                  Cardiac Conditions (Chronic)
+                </h4>
+                <div className="space-y-3">
+                  <MedicalConditionRow
+                    label="CAD (Coronary Artery Disease)"
+                    conditionKey="cad"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).cad}
+                    onChange={(field, value) => updateMedicalCondition('cad', field, value)}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="CHF (Congestive Heart Failure)"
+                    conditionKey="chf"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).chf}
+                    onChange={(field, value) => updateMedicalCondition('chf', field, value)}
+                    typeOptions={[
+                      { value: 'HFrEF', label: 'HFrEF (Reduced EF)' },
+                      { value: 'HFpEF', label: 'HFpEF (Preserved EF)' },
+                      { value: 'HFmrEF', label: 'HFmrEF (Mid-range EF)' },
+                    ]}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="LVH (Left Ventricular Hypertrophy)"
+                    conditionKey="lvh"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).lvh}
+                    onChange={(field, value) => updateMedicalCondition('lvh', field, value)}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="Valvular Disease"
+                    conditionKey="valvular_disease"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).valvular_disease}
+                    onChange={(field, value) => updateMedicalCondition('valvular_disease', field, value)}
+                    isChronicCondition
+                    hint="Specify valve & severity in details"
+                  />
+                  <MedicalConditionRow
+                    label="Pulmonary Hypertension"
+                    conditionKey="pulmonary_hypertension"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).pulmonary_hypertension}
+                    onChange={(field, value) => updateMedicalCondition('pulmonary_hypertension', field, value)}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="Cardiomyopathy"
+                    conditionKey="cardiomyopathy"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).cardiomyopathy}
+                    onChange={(field, value) => updateMedicalCondition('cardiomyopathy', field, value)}
+                    typeOptions={[
+                      { value: 'Dilated', label: 'Dilated' },
+                      { value: 'Hypertrophic', label: 'Hypertrophic' },
+                      { value: 'Restrictive', label: 'Restrictive' },
+                      { value: 'Ischemic', label: 'Ischemic' },
+                    ]}
+                    isChronicCondition
+                  />
+                </div>
+              </div>
+
+              {/* Systemic Conditions */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  Systemic Conditions (Chronic)
+                </h4>
+                <div className="space-y-3">
+                  <MedicalConditionRow
+                    label="Hypertension"
+                    conditionKey="hypertension"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).hypertension}
+                    onChange={(field, value) => updateMedicalCondition('hypertension', field, value)}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="Hyperlipidemia"
+                    conditionKey="hyperlipidemia"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).hyperlipidemia}
+                    onChange={(field, value) => updateMedicalCondition('hyperlipidemia', field, value)}
+                    isChronicCondition
+                  />
+                  <MedicalConditionRow
+                    label="Diabetes"
+                    conditionKey="diabetes"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).diabetes}
+                    onChange={(field, value) => updateMedicalCondition('diabetes', field, value)}
+                    typeOptions={[
+                      { value: 'Type 1', label: 'Type 1' },
+                      { value: 'Type 2', label: 'Type 2' },
+                    ]}
+                    isChronicCondition
+                    hint="Include A1c in notes if available"
+                  />
+                  <MedicalConditionRow
+                    label="CKD (Chronic Kidney Disease)"
+                    conditionKey="ckd"
+                    condition={(subject.medical_conditions as Record<string, MedicalConditionData>).ckd}
+                    onChange={(field, value) => updateMedicalCondition('ckd', field, value)}
+                    typeOptions={[
+                      { value: 'Stage 1', label: 'Stage 1 (GFR ≥90)' },
+                      { value: 'Stage 2', label: 'Stage 2 (GFR 60-89)' },
+                      { value: 'Stage 3a', label: 'Stage 3a (GFR 45-59)' },
+                      { value: 'Stage 3b', label: 'Stage 3b (GFR 30-44)' },
+                      { value: 'Stage 4', label: 'Stage 4 (GFR 15-29)' },
+                      { value: 'Stage 5', label: 'Stage 5 (GFR <15)' },
+                    ]}
+                    isChronicCondition
+                    hint="Include GFR in notes if available"
+                  />
+                </div>
+              </div>
             </SectionCard>
 
             <SectionCard
